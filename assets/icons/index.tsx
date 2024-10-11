@@ -23,6 +23,8 @@ import ImageIcon from '@/assets/icons/Image';
 import ThreeDotsCircle from '@/assets/icons/ThreeDotsCircle';
 import ThreeDotsHorizontal from '@/assets/icons/ThreeDotsHorizontal';
 import Logout from '@/assets/icons/Logout';
+import EyeOff from '@/assets/icons/EyeOff';
+import EyeOn from '@/assets/icons/EyeOn';
 
 type IconName = keyof typeof icons;
 interface IIconProps extends SvgProps {
@@ -54,6 +56,8 @@ const icons = {
   logoutIcon: Logout,
   imageIcon: ImageIcon,
   videoIcon: Video,
+  eyeOffIcon: EyeOff,
+  eyeOnIcon: EyeOn,
 };
 
 const Icon = ({name, size, strokeWidth, color, ...rest}: IIconProps) => {

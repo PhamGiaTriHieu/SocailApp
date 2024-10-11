@@ -1,5 +1,12 @@
 import React, {useRef, useState} from 'react';
-import {View, Text, StyleSheet, TextInput} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  Alert,
+} from 'react-native';
 import ScreenWrapper from '@/components/ScreenWrapper';
 import {theme} from '@/constants/theme';
 import Icon from '@/assets/icons';
@@ -20,11 +27,17 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const onSubmit = () => {};
+  const onSubmit = () => {
+    if (!email || !password) {
+      Alert.alert('Please fill in all fields');
+      return;
+    }
+  };
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper bg="white">
       <StatusBar style="dark" />
       <View style={styles.container}>
         <BackButton router={router} />
@@ -53,18 +66,46 @@ const Login = () => {
           <Input
             icon={<Icon name="lockIcon" size={26} strokeWidth={1.6} />}
             placeholder="Enter your password"
-            onChangeText={(value) => console.log('password', value)}
-            secureTextEntry={true}
+            onChangeText={(value) => setPassword(value)}
+            secureTextEntry={!showPassword}
+            iconEnd={
+              showPassword ? (
+                <Pressable onPress={() => setShowPassword(false)}>
+                  <Icon name="eyeOnIcon" size={26} />
+                </Pressable>
+              ) : (
+                <Pressable>
+                  <Icon
+                    name="eyeOffIcon"
+                    size={26}
+                    onPress={() => setShowPassword(true)}
+                  />
+                </Pressable>
+              )
+            }
           />
 
           <Text style={styles.forgotPassword}>Forgot Password?</Text>
 
           {/* button */}
-          <Button
-            title="Loading"
-            loading={loading}
-            onPress={() => console.log('clicked login')}
-          />
+          <Button title="Login" loading={loading} onPress={() => onSubmit()} />
+        </View>
+        {/* Footer */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Don't have an account?</Text>
+          <Pressable onPress={() => router.push('/signUp')}>
+            <Text
+              style={[
+                styles.footerText,
+                {
+                  color: theme.colors.primaryDark,
+                  fontWeight: theme.fonts.semibold,
+                },
+              ]}
+            >
+              Sign Up
+            </Text>
+          </Pressable>
         </View>
       </View>
     </ScreenWrapper>
@@ -79,12 +120,6 @@ const styles = StyleSheet.create({
     gap: 45,
     paddingHorizontal: widthPercentage(5),
   },
-
-  // welcomeImage: {
-  //   height: heightPercentage(30),
-  //   width: widthPercentage(100),
-  //   alignSelf: 'center',
-  // },
   welcomeText: {
     fontSize: heightPercentage(4),
     fontWeight: theme.fonts.bold,
@@ -98,28 +133,16 @@ const styles = StyleSheet.create({
     fontWeight: theme.fonts.semibold,
     color: theme.colors.text,
   },
-  // punchline: {
-  //   textAlign: 'center',
-  //   paddingHorizontal: widthPercentage(10),
-  //   fontSize: heightPercentage(1.7),
-  //   color: theme.colors.text,
-  // },
+
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 5,
   },
-  footerText: {},
-  // bottomTextContainer: {
-  //   flexDirection: 'row',
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   gap: 5,
-  // },
-  // loginText: {
-  //   textAlign: 'center',
-  //   color: theme.colors.text,
-  //   fontSize: heightPercentage(1.6),
-  // },
+  footerText: {
+    alignItems: 'center',
+    fontSize: heightPercentage(1.6),
+    color: theme.colors.text,
+  },
 });

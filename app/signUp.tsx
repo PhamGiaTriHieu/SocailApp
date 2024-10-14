@@ -18,6 +18,7 @@ import {heightPercentage, widthPercentage} from '@/helpers/commom';
 import Button from '@/components/Button';
 import BackButton from '@/components/BackButton';
 import Input from '@/components/Input';
+import {supabase} from '@/lib/supabase';
 
 const SignUp = () => {
   const router = useRouter();
@@ -32,9 +33,34 @@ const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!email || !password) {
-      Alert.alert('Please fill in all fields');
+      Alert.alert('Sign Up', 'Please fill in all fields');
+      return;
+    }
+    if (password !== passwordConfirm) {
+      Alert.alert('Passwords do not match');
+      return;
+    }
+    setLoading(true);
+
+    const {
+      data: {session, user},
+      error,
+    } = await supabase.auth.signUp({
+      email: email.trim(),
+      password: password.trim(),
+      options: {
+        data: {
+          name: name,
+        },
+      },
+    });
+
+    setLoading(false);
+    if (error) {
+      Alert.alert('SignUp', error.message);
+      setLoading(false);
       return;
     }
   };
@@ -69,6 +95,7 @@ const SignUp = () => {
           <Input
             icon={<Icon name="mailIcon" size={26} strokeWidth={1.6} />}
             placeholder="Enter your email"
+            textContentType="emailAddress"
             onChangeText={(value) => {
               setEmail(value);
             }}

@@ -1,12 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  Pressable,
-  Alert,
-} from 'react-native';
+import {View, Text, StyleSheet, Pressable, Alert} from 'react-native';
 import ScreenWrapper from '@/components/ScreenWrapper';
 import {theme} from '@/constants/theme';
 import Icon from '@/assets/icons';
@@ -18,6 +11,7 @@ import {heightPercentage, widthPercentage} from '@/helpers/commom';
 import Button from '@/components/Button';
 import BackButton from '@/components/BackButton';
 import Input from '@/components/Input';
+import {supabase} from '@/lib/supabase';
 
 const Login = () => {
   const router = useRouter();
@@ -29,9 +23,21 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!email || !password) {
       Alert.alert('Please fill in all fields');
+      return;
+    }
+    setLoading(true);
+    const {error} = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password: password.trim(),
+    });
+
+    setLoading(false);
+    if (error) {
+      Alert.alert('Login', error.message);
+      setLoading(false);
       return;
     }
   };

@@ -37,6 +37,7 @@ interface ITheme {
     textDark: string;
     rose: string;
     roseLight: string;
+    backgroundLogoutColor: string;
   };
   fonts: {
     medium: FontWeight;
@@ -66,6 +67,7 @@ export const theme: ITheme = {
     textDark: '#1D1D1D',
     rose: '#ef4444',
     roseLight: '#f87171',
+    backgroundLogoutColor: '#fee2e2',
   },
   fonts: {
     medium: '500',

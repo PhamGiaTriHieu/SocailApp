@@ -14,16 +14,15 @@ const _layout = () => {
 };
 
 const MainLayout = () => {
-  const {setAuth} = useAuth();
+  const {setAuth, setUserData} = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('session user: ', session?.user?.id);
       if (session) {
         // Go to home screen
         setAuth(session?.user);
-        updateUserData(session?.user);
+        updateUserData(session?.user, session?.user?.email);
         router.replace('/home');
       } else {
         // setAuth(null);
@@ -34,9 +33,9 @@ const MainLayout = () => {
     });
   }, []);
 
-  const updateUserData = async (user: any) => {
+  const updateUserData = async (user: any, email: string | undefined) => {
     const res = await getUserData(user?.id);
-    console.log('🚀 ~ res:', res);
+    if (res.success) setUserData({...res.data, email});
   };
 
   return <Stack screenOptions={{headerShown: false}} />;

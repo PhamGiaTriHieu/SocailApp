@@ -1,11 +1,5 @@
+import {User} from '@/interfaces/user';
 import React, {createContext, ReactNode, useContext, useState} from 'react';
-
-interface User {
-  // Define user properties here (e.g., id, name, etc.)
-  id?: string;
-  name?: string;
-  email?: string;
-}
 
 interface IAuthContext {
   user: User | null;
@@ -16,7 +10,7 @@ interface IAuthContext {
 const AuthContext = createContext<IAuthContext | null>(null);
 
 export const AuthProvider = ({children}: {children: ReactNode}) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
 
   const setAuth = (authUser: any) => {
     setUser(authUser);

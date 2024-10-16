@@ -1,5 +1,14 @@
+export interface IImagePicker {
+  assetId?: string;
+  fileName?: string;
+  fileSize?: number;
+  height?: number;
+  width?: number;
+  type?: string;
+  uri?: string;
+  [key: string]: unknown;
+}
 export interface User {
-  // Define user properties here (e.g., id, name, etc.)
   id?: string;
   name?: string;
   email?: string;
@@ -8,4 +17,12 @@ export interface User {
   address?: string | null;
   phoneNumber?: string | null;
   create_at?: string;
+}
+
+export interface IEditUser {
+  name?: string;
+  phoneNumber?: string;
+  image?: string | null;
+  bio?: string;
+  address?: string;
 }

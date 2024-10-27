@@ -1,15 +1,14 @@
 import React from 'react';
 import {
-  Pressable,
   StyleSheet,
-  Text,
   TextInput,
   TextInputProps,
   View,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import {theme} from '@/constants/theme';
 import {heightPercentage} from '@/helpers/commom';
-
+import {Keyboard} from 'react-native';
 interface IInputProps extends TextInputProps {
   containerStyles?: object;
   icon?: React.ReactNode | React.JSX.Element;
@@ -22,20 +21,22 @@ const Input = ({
   icon,
   iconEnd,
   inputRef,
-
   ...rest
 }: IInputProps) => {
   return (
-    <View style={[styles.container, containerStyles && containerStyles]}>
-      {icon ? icon : null}
-      <TextInput
-        style={{flex: 1}}
-        placeholderTextColor={theme.colors.textLight}
-        ref={inputRef}
-        {...rest}
-      />
-      {iconEnd ? iconEnd : null}
-    </View>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={[styles.container, containerStyles && containerStyles]}>
+        {icon ? icon : null}
+        <TextInput
+          style={{flex: 1}}
+          placeholderTextColor={theme.colors.textLight}
+          ref={inputRef}
+          showSoftInputOnFocus={false}
+          {...rest}
+        />
+        {iconEnd ? iconEnd : null}
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 

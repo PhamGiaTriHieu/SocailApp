@@ -19,6 +19,23 @@ export const getSupabaseFileUrl = (filePath: string) => {
   return null;
 };
 
+const getLocalFilePath = (filePath: string) => {
+  const fileName = filePath.split('/').pop();
+  console.log('fileName: ', fileName);
+  console.log('documentDirectory: ', FileSystem.documentDirectory);
+  return `${FileSystem.documentDirectory}${fileName}`;
+};
+
+export const downloadFile = async (url: string) => {
+  try {
+    const {uri} = await FileSystem.downloadAsync(url, getLocalFilePath(url));
+    return uri;
+  } catch (error) {
+    console.log('file download error: ', error);
+    return {success: false, message: 'Could not download media file'};
+  }
+};
+
 export const uploadFile = async (
   folderName: string,
   fileUri: string,

@@ -9,3 +9,7 @@ export const heightPercentage = (percentage: number) => {
 export const widthPercentage = (percentage: number) => {
   return (percentage * deviceWidth) / 100;
 };
+
+export const removeHtmlTags = (html: string) => {
+  return html.replace(/<[^>]*>?/gm, '');
+};

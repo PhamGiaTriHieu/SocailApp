@@ -25,12 +25,17 @@ import {downloadFile, getSupabaseFileUrl} from '@/services/imageService';
 import {ResizeMode, Video} from 'expo-av';
 import {createPostLike, removePostLike} from '@/services/postService';
 import Loading from '@/components/Loading';
+import {getCreateAt} from '@/constants/common';
 
 interface IPostCardProps {
   item: IGetPostsData;
   currentUser: User | null;
   router: Router;
   hasShadow?: boolean;
+  showMoreIcon?: boolean;
+  showDelete?: boolean;
+  onDelete?: (item: IGetPostsData) => {};
+  onEdit?: (item: IGetPostsData) => {};
 }
 
 const textStyles = {
@@ -54,6 +59,10 @@ const PostCard = ({
   currentUser,
   router,
   hasShadow = true,
+  showMoreIcon = true,
+  showDelete = false,
+  onDelete,
+  onEdit,
 }: IPostCardProps) => {
   const shadowStyles = {
     shadowOffset: {
@@ -66,19 +75,23 @@ const PostCard = ({
   };
   const [loading, setLoading] = useState(false);
 
-  const createAt = moment(item?.created_at).format('MMM D');
+  // const createAt = moment(item?.created_at).format('MMM D');
+  const createAt = getCreateAt(item?.created_at);
   const [likes, setLikes] = useState<IPostLike[]>([]);
 
   useEffect(() => {
     setLikes(item?.postLikes);
   }, []);
 
-  const liked = likes.filter((like) => like?.userId === currentUser?.id)[0]
-    ? true
-    : false;
+  const liked =
+    likes?.length && likes.filter((like) => like?.userId === currentUser?.id)[0]
+      ? true
+      : false;
 
-  const comments = [];
-  const openPostDetails = () => {};
+  const openPostDetails = () => {
+    if (!showMoreIcon) return null;
+    router.push({pathname: '/postDetails', params: {postId: item?.id}});
+  };
 
   const onLike = async () => {
     if (!currentUser?.id && !item?.id) return;
@@ -128,6 +141,21 @@ const PostCard = ({
     Share.share(content);
   };
 
+  const handlePostDelete = () => {
+    Alert.alert('Confirm', 'Are you sure you want to delete this?', [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('modal cancel'),
+        style: 'cancel',
+      },
+      {
+        text: 'Delete',
+        onPress: () => onDelete!(item),
+        style: 'destructive',
+      },
+    ]);
+  };
+
   return (
     <View style={[styles.container, hasShadow && shadowStyles]}>
       <View style={styles.header}>
@@ -144,14 +172,35 @@ const PostCard = ({
           </View>
         </View>
 
-        <TouchableOpacity onPress={openPostDetails}>
-          <Icon
-            name="threeDotsHorizontalIcon"
-            size={heightPercentage(3.4)}
-            strokeWidth={3}
-            color={theme.colors.text}
-          />
-        </TouchableOpacity>
+        {showMoreIcon && (
+          <TouchableOpacity onPress={openPostDetails}>
+            <Icon
+              name="threeDotsHorizontalIcon"
+              size={heightPercentage(3.4)}
+              strokeWidth={3}
+              color={theme.colors.text}
+            />
+          </TouchableOpacity>
+        )}
+
+        {showDelete && currentUser?.id === item?.userId && (
+          <View style={styles.actions}>
+            <TouchableOpacity onPress={() => onEdit!(item)}>
+              <Icon
+                name="editIcon"
+                size={heightPercentage(2.5)}
+                color={theme.colors.text}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handlePostDelete}>
+              <Icon
+                name="deleteIcon"
+                size={heightPercentage(2.5)}
+                color={theme.colors.rose}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       {/* Post body & Media */}
@@ -201,10 +250,10 @@ const PostCard = ({
         </View>
 
         <View style={styles.footerButton}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={openPostDetails}>
             <Icon name="commentIcon" size={24} color={theme.colors.textLight} />
           </TouchableOpacity>
-          <Text style={styles.count}>{comments?.length}</Text>
+          <Text style={styles.count}>{item?.comments?.[0]?.count}</Text>
         </View>
 
         <View style={styles.footerButton}>
@@ -276,6 +325,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+  },
+  actions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 18,
   },
   count: {
     fontSize: heightPercentage(1.5),

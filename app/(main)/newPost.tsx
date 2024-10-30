@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {RefObject, useEffect, useRef, useState} from 'react';
 import {
   Alert,
   Image,
@@ -16,7 +16,7 @@ import {heightPercentage, widthPercentage} from '@/helpers/commom';
 import Avatar from '@/components/Avatar';
 import {useAuth} from '@/contexts/AuthContext';
 import RichTextEditor from '@/components/RichTextEditor';
-import {useRouter} from 'expo-router';
+import {useLocalSearchParams, useRouter} from 'expo-router';
 import Icon from '@/assets/icons';
 import Button from '@/components/Button';
 import * as ImagePicker from 'expo-image-picker';
@@ -26,16 +26,32 @@ import {IFileProps, IPost} from '@/interfaces/file';
 import {createOrUpdatePost} from '@/services/postService';
 
 const NewPost = () => {
+  const postDataEdit = useLocalSearchParams();
+
   const {user} = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const [textEditorValue, setTextEditorValue] = useState<string>('');
+  const [textEditorValue, setTextEditorValue] = useState<any>('');
 
-  const bodyRef = useRef('');
-  const editorRef = useRef(null);
+  // const bodyRef = useRef('');
+  const editorRef = useRef<any>(null);
 
-  const [file, setFile] = useState<IFileProps | undefined | null>();
+  const [file, setFile] = useState<IFileProps | undefined | null | string>();
+
+  useEffect(() => {
+    if (postDataEdit && postDataEdit?.id) {
+      setTextEditorValue(postDataEdit?.body);
+
+      postDataEdit?.file
+        ? setFile(postDataEdit?.file as string)
+        : setFile(null);
+
+      // setTimeout(() => {
+      //   editorRef?.current?.setContentHTML(postDataEdit?.body);
+      // }, 300);
+    }
+  }, [editorRef]);
 
   const onPick = async (isImage: boolean) => {
     const mediaConfig = {
@@ -61,8 +77,11 @@ const NewPost = () => {
     return false;
   };
 
-  const getFieUri = (file: IFileProps | undefined | null) => {
+  const getFieUri = (file: IFileProps | undefined | null | string) => {
     if (!file) return null;
+    if (typeof file === 'string') {
+      return getSupabaseFileUrl(file)?.uri;
+    }
     if (isLocalFile(file)) {
       return file.uri;
     }
@@ -70,13 +89,20 @@ const NewPost = () => {
     return getSupabaseFileUrl(file.uri);
   };
 
-  const getFileType = (file: IFileProps) => {
+  const getFileType = (file: IFileProps | string) => {
     if (!file) return null;
+
+    if (typeof file === 'string') {
+      const extFile = file.split('/');
+      if (Array.isArray(extFile) && extFile.includes('postImages')) {
+        return 'image';
+      }
+      return 'video';
+    }
     if (isLocalFile(file)) {
       return file.type;
     }
     // check image or video remote file
-
     if (Array.isArray(file) && file.includes('postImages')) {
       return 'image';
     }
@@ -90,11 +116,15 @@ const NewPost = () => {
       return;
     }
 
-    const postData: IPost = {
+    let postData: IPost = {
       file,
       body: textEditorValue,
       userId: user?.id,
     };
+
+    if (postDataEdit && postDataEdit?.id)
+      postData = {...postData, id: postDataEdit?.id as string};
+
     // Create post
     setLoading(true);
     const res = await createOrUpdatePost(postData);
@@ -134,6 +164,7 @@ const NewPost = () => {
 
           <View style={styles.textEditor}>
             <RichTextEditor
+              editTextValue={textEditorValue}
               editorRef={editorRef}
               onChange={(value: string) => setTextEditorValue(value)}
             />
@@ -180,7 +211,7 @@ const NewPost = () => {
         </ScrollView>
 
         <Button
-          title="Post"
+          title={postDataEdit && postDataEdit?.id ? 'Update' : 'Post'}
           loading={loading}
           onPress={onSubmit}
           hasShadow={false}

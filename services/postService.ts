@@ -34,7 +34,57 @@ export const createOrUpdatePost = async (post: IPost) => {
   }
 };
 
-export const fetchPosts = async (limit = 10) => {
+export const fetchPosts = async (limit = 10, userId?: string) => {
+  try {
+    if (userId) {
+      const {data, error} = await supabase
+        .from('posts')
+        .select(
+          `
+         *,
+        user: users (id,name,image),
+        postLikes (*),
+        comments (count)
+        `
+        )
+        .order('created_at', {ascending: false})
+        .eq('userId', userId)
+        .limit(limit);
+
+      if (error) {
+        console.log('Fetch posts error: ', error);
+        return {success: false, message: 'Could not fetch posts'};
+      }
+
+      return {success: true, data};
+    } else {
+      const {data, error} = await supabase
+        .from('posts')
+        .select(
+          `
+         *,
+        user: users (id,name,image),
+        postLikes (*),
+        comments (count)
+        `
+        )
+        .order('created_at', {ascending: false})
+        .limit(limit);
+
+      if (error) {
+        console.log('Fetch posts error: ', error);
+        return {success: false, message: 'Could not fetch posts'};
+      }
+
+      return {success: true, data};
+    }
+  } catch (error) {
+    console.log('fetchPost error: ', error);
+    return {success: false, message: 'Could not fetch the post'};
+  }
+};
+
+export const fetchPostDetails = async (postId: string | number) => {
   try {
     const {data, error} = await supabase
       .from('posts')
@@ -42,20 +92,22 @@ export const fetchPosts = async (limit = 10) => {
         `
          *,
         user: users (id,name,image),
-        postLikes (*)
+        postLikes (*),
+        comments (*, user: users(id,name,image))
         `
       )
-      .order('created_at', {ascending: false})
-      .limit(limit);
+      .eq('id', postId)
+      .order('created_at', {ascending: false, foreignTable: 'comments'})
+      .single();
 
     if (error) {
-      console.log('Fetch posts error: ', error);
+      console.log('fetchPostDetails error: ', error);
       return {success: false, message: 'Could not fetch posts'};
     }
 
     return {success: true, data};
   } catch (error) {
-    console.log('fetchPost error: ', error);
+    console.log('fetchPostDetails error: ', error);
     return {success: false, message: 'Could not fetch the post'};
   }
 };
@@ -99,5 +151,62 @@ export const removePostLike = async (postId: number, userId: string) => {
   } catch (error) {
     console.log('postLike error: ', error);
     return {success: false, message: 'Could not remove the post like'};
+  }
+};
+
+export const createComment = async (comment: {
+  userId: string;
+  postId: number;
+  text: string;
+}) => {
+  try {
+    const {data, error} = await supabase
+      .from('comments')
+      .insert(comment)
+      .select()
+      .single();
+
+    if (error) {
+      console.log('comment error: ', error);
+      return {success: false, message: 'Could not create your comment'};
+    }
+
+    return {success: true, data};
+  } catch (error) {
+    console.log('comment error: ', error);
+    return {success: false, message: 'Could not create your comment'};
+  }
+};
+
+export const removeComment = async (commentId: number) => {
+  try {
+    const {error} = await supabase
+      .from('comments')
+      .delete()
+      .eq('id', commentId);
+    if (error) {
+      console.log('remove error: ', error);
+      return {success: false, message: 'Could not remove the comment'};
+    }
+
+    return {success: true, data: {commentId}};
+  } catch (error) {
+    console.log('remove error: ', error);
+    return {success: false, message: 'Could not remove the comment'};
+  }
+};
+
+export const removePost = async (postId: number) => {
+  try {
+    const {error} = await supabase.from('posts').delete().eq('id', postId);
+    if (error) {
+      console.log('remove post error: ', error);
+      return {success: false, message: 'Could not remove the post'};
+    }
+
+    return {success: true, data: {postId}};
+  } catch (error) {
+    console.log('remove post error: ', error);
+    return {success: false, message: 'Could not remove the post'};
   }
 };

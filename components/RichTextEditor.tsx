@@ -4,12 +4,16 @@ import {StyleSheet, Text, View} from 'react-native';
 import {actions, RichEditor, RichToolbar} from 'react-native-pell-rich-editor';
 
 interface IRichTextEditorProps {
-  //   editorRef: React.RefObject<any>;
   editorRef: any;
+  editTextValue?: any;
   onChange: (value: string) => void;
 }
 
-const RichTextEditor = ({editorRef, onChange}: IRichTextEditorProps) => {
+const RichTextEditor = ({
+  editorRef,
+  editTextValue,
+  onChange,
+}: IRichTextEditorProps) => {
   return (
     <View style={{minHeight: 285}}>
       <RichToolbar
@@ -47,6 +51,7 @@ const RichTextEditor = ({editorRef, onChange}: IRichTextEditorProps) => {
         ref={editorRef}
         containerStyle={styles.rich}
         editorStyle={{color: theme.colors.textDark, placeholderColor: 'gray'}}
+        initialContentHTML={editTextValue}
         placeholder="What's on your mind"
         onChange={onChange}
       />

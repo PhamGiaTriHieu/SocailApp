@@ -4,6 +4,7 @@ export interface IFileProps extends ImagePicker.ImagePickerAsset {
 }
 
 export interface IPost {
+  id?: string | number;
   userId: string | undefined;
   file: IFileProps | string | undefined | null;
   body: string;

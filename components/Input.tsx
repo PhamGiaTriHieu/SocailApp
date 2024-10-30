@@ -1,14 +1,17 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   TextInput,
   TextInputProps,
   View,
-  TouchableWithoutFeedback,
+  // TouchableWithoutFeedback,
+  Keyboard,
+  KeyboardAvoidingView,
+  KeyboardEventListener,
 } from 'react-native';
 import {theme} from '@/constants/theme';
 import {heightPercentage} from '@/helpers/commom';
-import {Keyboard} from 'react-native';
+
 interface IInputProps extends TextInputProps {
   containerStyles?: object;
   icon?: React.ReactNode | React.JSX.Element;
@@ -23,20 +26,44 @@ const Input = ({
   inputRef,
   ...rest
 }: IInputProps) => {
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener(
+      'keyboardDidShow',
+      handleKeyboardShow
+    );
+
+    const hideSubscription = Keyboard.addListener(
+      'keyboardDidHide',
+      handleKeyboardShow
+    );
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
+  const handleKeyboardShow: KeyboardEventListener = (event) => {
+    setIsKeyboardVisible(true);
+  };
+
+  const handleKeyboardHide: KeyboardEventListener = (event) => {
+    setIsKeyboardVisible(false);
+  };
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={[styles.container, containerStyles && containerStyles]}>
-        {icon ? icon : null}
-        <TextInput
-          style={{flex: 1}}
-          placeholderTextColor={theme.colors.textLight}
-          ref={inputRef}
-          showSoftInputOnFocus={false}
-          {...rest}
-        />
-        {iconEnd ? iconEnd : null}
-      </View>
-    </TouchableWithoutFeedback>
+    <View style={[styles.container, containerStyles && containerStyles]}>
+      {icon ? icon : null}
+      <TextInput
+        style={{flex: 1}}
+        placeholderTextColor={theme.colors.textLight}
+        ref={inputRef}
+        {...rest}
+      />
+
+      {iconEnd ? iconEnd : null}
+    </View>
   );
 };
 

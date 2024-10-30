@@ -1,4 +1,4 @@
-import React, {RefObject, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Alert,
   Image,
@@ -24,6 +24,7 @@ import {ResizeMode, Video} from 'expo-av';
 import {getSupabaseFileUrl} from '@/services/imageService';
 import {IFileProps, IPost} from '@/interfaces/file';
 import {createOrUpdatePost} from '@/services/postService';
+import KeyboardAvoidViewContainer from '@/components/KeyboardAvoidViewContainer';
 
 const NewPost = () => {
   const postDataEdit = useLocalSearchParams();
@@ -139,7 +140,7 @@ const NewPost = () => {
       Alert.alert('Post', 'Could not create post');
     }
   };
-
+  // <Pressable onPress={() => editorRef.current?.dismissKeyboard()}>
   return (
     <ScreenWrapper bg="white">
       <View style={styles.container}>
@@ -149,67 +150,73 @@ const NewPost = () => {
           contentContainerStyle={{gap: 20}}
           showsVerticalScrollIndicator={false}
         >
-          {/* Avatar */}
-          <View style={styles.header}>
-            <Avatar
-              uri={user?.image}
-              size={heightPercentage(6.5)}
-              rounded={theme.radius.xl}
-            />
-            <View style={{gap: 2}}>
-              <Text style={styles.userName}>{user && user?.name}</Text>
-              <Text style={styles.publicText}>Public</Text>
+          <Pressable
+            onPress={() => editorRef.current?.dismissKeyboard()}
+            style={{gap: 20}}
+          >
+            {/* Avatar */}
+            <View style={styles.header}>
+              <Avatar
+                uri={user?.image}
+                size={heightPercentage(6.5)}
+                rounded={theme.radius.xl}
+              />
+              <View style={{gap: 2}}>
+                <Text style={styles.userName}>{user && user?.name}</Text>
+                <Text style={styles.publicText}>Public</Text>
+              </View>
             </View>
-          </View>
 
-          <View style={styles.textEditor}>
-            <RichTextEditor
-              editTextValue={textEditorValue}
-              editorRef={editorRef}
-              onChange={(value: string) => setTextEditorValue(value)}
-            />
-          </View>
-
-          {file && (
-            <View style={styles.file}>
-              {getFileType(file) == 'video' ? (
-                <Video
-                  style={{flex: 1}}
-                  source={{uri: `${getFieUri(file)}`}}
-                  useNativeControls
-                  resizeMode={ResizeMode.COVER}
-                  isLooping
-                  isMuted={false}
-                  volume={0.4}
-                />
-              ) : (
-                <Image
-                  source={{uri: `${getFieUri(file)}`}}
-                  resizeMode="cover"
-                  style={{flex: 1}}
-                />
-              )}
-
-              <Pressable style={styles.closeIcon} onPress={() => setFile(null)}>
-                <Icon name="deleteIcon" size={20} color="white" />
-              </Pressable>
+            <View style={styles.textEditor}>
+              <RichTextEditor
+                editTextValue={textEditorValue}
+                editorRef={editorRef}
+                onChange={(value: string) => setTextEditorValue(value)}
+              />
             </View>
-          )}
 
-          <View style={styles.media}>
-            <Text style={styles.addImageText}>Add to your post</Text>
-            <View style={styles.mediaIcon}>
-              <TouchableOpacity onPress={() => onPick(true)}>
-                <Icon name="imageIcon" size={30} color={theme.colors.dark} />
-              </TouchableOpacity>
+            {file && (
+              <View style={styles.file}>
+                {getFileType(file) == 'video' ? (
+                  <Video
+                    style={{flex: 1}}
+                    source={{uri: `${getFieUri(file)}`}}
+                    useNativeControls
+                    resizeMode={ResizeMode.COVER}
+                    isLooping
+                    isMuted={false}
+                    volume={0.4}
+                  />
+                ) : (
+                  <Image
+                    source={{uri: `${getFieUri(file)}`}}
+                    resizeMode="cover"
+                    style={{flex: 1}}
+                  />
+                )}
 
-              <TouchableOpacity onPress={() => onPick(false)}>
-                <Icon name="videoIcon" size={33} color={theme.colors.dark} />
-              </TouchableOpacity>
+                <Pressable
+                  style={styles.closeIcon}
+                  onPress={() => setFile(null)}
+                >
+                  <Icon name="deleteIcon" size={20} color="white" />
+                </Pressable>
+              </View>
+            )}
+            <View style={styles.media}>
+              <Text style={styles.addImageText}>Add to your post</Text>
+              <View style={styles.mediaIcon}>
+                <TouchableOpacity onPress={() => onPick(true)}>
+                  <Icon name="imageIcon" size={30} color={theme.colors.dark} />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => onPick(false)}>
+                  <Icon name="videoIcon" size={33} color={theme.colors.dark} />
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          </Pressable>
         </ScrollView>
-
         <Button
           title={postDataEdit && postDataEdit?.id ? 'Update' : 'Post'}
           loading={loading}

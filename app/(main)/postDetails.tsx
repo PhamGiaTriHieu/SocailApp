@@ -1,6 +1,7 @@
 import Icon from '@/assets/icons';
 import CommentItem from '@/components/CommentItem';
 import Input from '@/components/Input';
+import KeyboardAvoidViewContainer from '@/components/KeyboardAvoidViewContainer';
 import Loading from '@/components/Loading';
 import PostCard from '@/components/PostCard';
 import {theme} from '@/constants/theme';
@@ -165,70 +166,72 @@ const PostDetails = () => {
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.list}
-      >
-        <PostCard
-          item={{...post, comments: [{count: post?.comments?.length}]}}
-          currentUser={user}
-          router={router}
-          hasShadow={false}
-          showMoreIcon={false}
-          showDelete={true}
-          onDelete={onDeletePost}
-          onEdit={onEditPost}
-        />
-
-        {/* Comment  input */}
-
-        <View style={styles.inputContainer}>
-          <Input
-            placeholder="Type comment..."
-            placeholderTextColor={theme.colors.textLight}
-            containerStyles={{
-              flex: 1,
-              height: heightPercentage(6.2),
-              borderRadius: theme.radius.xl,
-            }}
-            onChangeText={(value) => setInputValue(value)}
-            value={inputValue}
+      <KeyboardAvoidViewContainer>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.list}
+        >
+          <PostCard
+            item={{...post, comments: [{count: post?.comments?.length}]}}
+            currentUser={user}
+            router={router}
+            hasShadow={false}
+            showMoreIcon={false}
+            showDelete={true}
+            onDelete={onDeletePost}
+            onEdit={onEditPost}
           />
 
-          {loading ? (
-            <View style={styles.loading}>
-              <Loading size="small" />
-            </View>
-          ) : (
-            <TouchableOpacity style={styles.sendIcon} onPress={onNewComment}>
-              <Icon name="sendIcon" color={theme.colors.primaryDark} />
-            </TouchableOpacity>
-          )}
-        </View>
+          {/* Comment  input */}
 
-        {/* comment List */}
-        <View style={{marginVertical: 15, gap: 17}}>
-          {post?.comments?.map((comment) => {
-            return (
-              <CommentItem
-                key={comment?.id?.toString()}
-                item={comment}
-                highLight={comment?.id == commentId}
-                canDelete={
-                  comment?.user?.id === user?.id || user?.id === post?.userId
-                }
-                onDelete={onDeleteComment}
-              />
-            );
-          })}
+          <View style={styles.inputContainer}>
+            <Input
+              placeholder="Type comment..."
+              placeholderTextColor={theme.colors.textLight}
+              containerStyles={{
+                flex: 1,
+                height: heightPercentage(6.2),
+                borderRadius: theme.radius.xl,
+              }}
+              onChangeText={(value) => setInputValue(value)}
+              value={inputValue}
+            />
 
-          {post?.comments?.length === 0 && (
-            <Text style={{color: theme.colors.text, marginLeft: 5}}>
-              Be first to comment!
-            </Text>
-          )}
-        </View>
-      </ScrollView>
+            {loading ? (
+              <View style={styles.loading}>
+                <Loading size="small" />
+              </View>
+            ) : (
+              <TouchableOpacity style={styles.sendIcon} onPress={onNewComment}>
+                <Icon name="sendIcon" color={theme.colors.primaryDark} />
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* comment List */}
+          <View style={{marginVertical: 15, gap: 17}}>
+            {post?.comments?.map((comment) => {
+              return (
+                <CommentItem
+                  key={comment?.id?.toString()}
+                  item={comment}
+                  highLight={comment?.id == commentId}
+                  canDelete={
+                    comment?.user?.id === user?.id || user?.id === post?.userId
+                  }
+                  onDelete={onDeleteComment}
+                />
+              );
+            })}
+
+            {post?.comments?.length === 0 && (
+              <Text style={{color: theme.colors.text, marginLeft: 5}}>
+                Be first to comment!
+              </Text>
+            )}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidViewContainer>
     </View>
   );
 };

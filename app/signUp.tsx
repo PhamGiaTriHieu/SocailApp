@@ -1,12 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  Pressable,
-  Alert,
-} from 'react-native';
+import {View, Text, StyleSheet, Pressable, Alert} from 'react-native';
 import ScreenWrapper from '@/components/ScreenWrapper';
 import {theme} from '@/constants/theme';
 import Icon from '@/assets/icons';
@@ -19,6 +12,7 @@ import Button from '@/components/Button';
 import BackButton from '@/components/BackButton';
 import Input from '@/components/Input';
 import {supabase} from '@/lib/supabase';
+import KeyboardAvoidViewContainer from '@/components/KeyboardAvoidViewContainer';
 
 const SignUp = () => {
   const router = useRouter();
@@ -68,110 +62,116 @@ const SignUp = () => {
   return (
     <ScreenWrapper bg="white">
       <StatusBar style="dark" />
-      <View style={styles.container}>
-        <BackButton router={router} />
-        {/* Welcome */}
-        <View>
-          <Text style={styles.welcomeText}>Let's,</Text>
-          <Text style={styles.welcomeText}>Get Started</Text>
-        </View>
-        {/* Form */}
-        <View style={styles.form}>
-          <Text
-            style={{fontSize: heightPercentage(1.5), color: theme.colors.text}}
-          >
-            Please fill the details to create an account
-          </Text>
-          {/* name */}
-          <Input
-            icon={<Icon name="userIcon" size={26} strokeWidth={1.6} />}
-            placeholder="Enter your name"
-            onChangeText={(value) => {
-              setName(value);
-            }}
-          />
+      <KeyboardAvoidViewContainer>
+        <View style={styles.container}>
+          <BackButton router={router} />
+          {/* Welcome */}
+          <View>
+            <Text style={styles.welcomeText}>Let's,</Text>
+            <Text style={styles.welcomeText}>Get Started</Text>
+          </View>
+          {/* Form */}
 
-          {/* email */}
-          <Input
-            icon={<Icon name="mailIcon" size={26} strokeWidth={1.6} />}
-            placeholder="Enter your email"
-            textContentType="emailAddress"
-            onChangeText={(value) => {
-              setEmail(value);
-            }}
-          />
-
-          {/* password */}
-          <Input
-            icon={<Icon name="lockIcon" size={26} strokeWidth={1.6} />}
-            placeholder="Enter your password"
-            onChangeText={(value) => setPassword(value)}
-            secureTextEntry={!showPassword}
-            iconEnd={
-              showPassword ? (
-                <Pressable onPress={() => setShowPassword(false)}>
-                  <Icon name="eyeOnIcon" size={26} />
-                </Pressable>
-              ) : (
-                <Pressable>
-                  <Icon
-                    name="eyeOffIcon"
-                    size={26}
-                    onPress={() => setShowPassword(true)}
-                  />
-                </Pressable>
-              )
-            }
-          />
-
-          {/* password Confirm */}
-          <Input
-            icon={<Icon name="lockIcon" size={26} strokeWidth={1.6} />}
-            placeholder="Enter your confirm password"
-            onChangeText={(value) => setPasswordConfirm(value)}
-            secureTextEntry={!showPasswordConfirm}
-            iconEnd={
-              showPasswordConfirm ? (
-                <Pressable onPress={() => setShowPasswordConfirm(false)}>
-                  <Icon name="eyeOnIcon" size={26} />
-                </Pressable>
-              ) : (
-                <Pressable>
-                  <Icon
-                    name="eyeOffIcon"
-                    size={26}
-                    onPress={() => setShowPasswordConfirm(true)}
-                  />
-                </Pressable>
-              )
-            }
-          />
-
-          {/* button */}
-          <Button
-            title="Sign Up"
-            loading={loading}
-            onPress={() => onSubmit()}
-          />
-        </View>
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Already have an account?</Text>
-          <Pressable onPress={() => router.push('/login')}>
+          <View style={styles.form}>
             <Text
-              style={[
-                styles.footerText,
-                {
-                  color: theme.colors.primaryDark,
-                  fontWeight: theme.fonts.semibold,
-                },
-              ]}
+              style={{
+                fontSize: heightPercentage(1.5),
+                color: theme.colors.text,
+              }}
             >
-              Login
+              Please fill the details to create an account
             </Text>
-          </Pressable>
+            {/* name */}
+            <Input
+              icon={<Icon name="userIcon" size={26} strokeWidth={1.6} />}
+              placeholder="Enter your name"
+              onChangeText={(value) => {
+                setName(value);
+              }}
+            />
+
+            {/* email */}
+            <Input
+              icon={<Icon name="mailIcon" size={26} strokeWidth={1.6} />}
+              placeholder="Enter your email"
+              textContentType="emailAddress"
+              onChangeText={(value) => {
+                setEmail(value);
+              }}
+            />
+
+            {/* password */}
+            <Input
+              icon={<Icon name="lockIcon" size={26} strokeWidth={1.6} />}
+              placeholder="Enter your password"
+              onChangeText={(value) => setPassword(value)}
+              secureTextEntry={!showPassword}
+              iconEnd={
+                showPassword ? (
+                  <Pressable onPress={() => setShowPassword(false)}>
+                    <Icon name="eyeOnIcon" size={26} />
+                  </Pressable>
+                ) : (
+                  <Pressable>
+                    <Icon
+                      name="eyeOffIcon"
+                      size={26}
+                      onPress={() => setShowPassword(true)}
+                    />
+                  </Pressable>
+                )
+              }
+            />
+
+            {/* password Confirm */}
+            <Input
+              icon={<Icon name="lockIcon" size={26} strokeWidth={1.6} />}
+              placeholder="Enter your confirm password"
+              onChangeText={(value) => setPasswordConfirm(value)}
+              secureTextEntry={!showPasswordConfirm}
+              iconEnd={
+                showPasswordConfirm ? (
+                  <Pressable onPress={() => setShowPasswordConfirm(false)}>
+                    <Icon name="eyeOnIcon" size={26} />
+                  </Pressable>
+                ) : (
+                  <Pressable>
+                    <Icon
+                      name="eyeOffIcon"
+                      size={26}
+                      onPress={() => setShowPasswordConfirm(true)}
+                    />
+                  </Pressable>
+                )
+              }
+            />
+
+            {/* button */}
+            <Button
+              title="Sign Up"
+              loading={loading}
+              onPress={() => onSubmit()}
+            />
+          </View>
+          {/* Footer */}
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Already have an account?</Text>
+            <Pressable onPress={() => router.push('/login')}>
+              <Text
+                style={[
+                  styles.footerText,
+                  {
+                    color: theme.colors.primaryDark,
+                    fontWeight: theme.fonts.semibold,
+                  },
+                ]}
+              >
+                Login
+              </Text>
+            </Pressable>
+          </View>
         </View>
-      </View>
+      </KeyboardAvoidViewContainer>
     </ScreenWrapper>
   );
 };

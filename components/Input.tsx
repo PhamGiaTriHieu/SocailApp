@@ -53,6 +53,7 @@ const Input = ({
     setIsKeyboardVisible(false);
   };
   return (
+    
     <View style={[styles.container, containerStyles && containerStyles]}>
       {icon ? icon : null}
       <TextInput
